@@ -318,6 +318,22 @@
             box-shadow: 0 0 40px var(--accent-glow);
         }
 
+        /* Toggle Button for Force Fit */
+        .toggle-btn {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .toggle-btn.active {
+            background: var(--accent-primary);
+            color: #000;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
         /* Text Gradients */
         .text-gradient-main {
             background: linear-gradient(to right, #fff, var(--accent-primary));
@@ -438,6 +454,15 @@
                     </div>
                 </div>
 
+                <!-- Force Fit Toggle -->
+                <div class="space-y-2">
+                    <label class="text-lg font-bold block tracking-wide font-tech" style="color: var(--text-muted)">CONTENT SCALING</label>
+                    <button id="forceFitBtn" onclick="toggleForceFit()" class="toggle-btn active w-full py-3 rounded-lg text-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-expand"></i> FORCE FIT WIDTH
+                    </button>
+                    <p class="text-xs opacity-60" style="color: var(--text-muted)">Overrides max-width constraints to fill canvas.</p>
+                </div>
+
                 <div class="p-5 rounded border border-[var(--accent-secondary)] shadow-[0_0_20px_var(--glass-border)] relative overflow-hidden group" style="background: linear-gradient(90deg, rgba(0,0,0,0.2), transparent);">
                     <div class="absolute top-0 left-0 w-1 h-full" style="background: var(--accent-secondary)"></div>
                     <i class="fa-solid fa-infinity mr-2" style="color: var(--accent-secondary)"></i>
@@ -511,6 +536,9 @@
         const widthSlider = document.getElementById('widthSlider');
         const zoomLabel = document.getElementById('zoomLabel');
         const statusMsg = document.getElementById('statusMsg');
+        const forceFitBtn = document.getElementById('forceFitBtn');
+
+        let isForceFit = true; // Default ON
 
         // --- Initialization ---
         window.addEventListener('DOMContentLoaded', () => {
@@ -540,9 +568,35 @@
             showStatus("RESET: 1920PX");
         }
 
+        function toggleForceFit() {
+            isForceFit = !isForceFit;
+            if(isForceFit) {
+                forceFitBtn.classList.add('active');
+            } else {
+                forceFitBtn.classList.remove('active');
+            }
+            updatePreview();
+        }
+
         function updatePreview() {
             const content = editor.value;
             const width = parseInt(baseWidthInput.value) || 1920;
+
+            let extraStyles = `
+                body { margin: 0; padding: 0; width: ${width}px; overflow: hidden; }
+                html, body { min-height: 100vh; }
+            `;
+
+            // INJECT FORCE FIT STYLES
+            if (isForceFit) {
+                extraStyles += `
+                    /* FORCE FIT OVERRIDES */
+                    [class*="max-w-"] { max-width: none !important; }
+                    .container { max-width: 100% !important; width: 100% !important; }
+                    .wrapper { max-width: 100% !important; width: 100% !important; }
+                    table { width: 100% !important; }
+                `;
+            }
 
             const docContent = `
                 <!DOCTYPE html>
@@ -550,8 +604,7 @@
                 <head>
                     <meta charset="utf-8">
                     <style>
-                        body { margin: 0; padding: 0; width: ${width}px; overflow: hidden; }
-                        html, body { min-height: 100vh; } 
+                        ${extraStyles}
                     </style>
                 </head>
                 <body>
@@ -657,8 +710,20 @@
             const width = parseInt(baseWidthInput.value) || 1920;
             const height = parseInt(iframe.style.height) || Math.round(width * 0.5625);
 
+            // Add Styles for Export
+            let styleInjection = "";
+            if(isForceFit) {
+                styleInjection = `<style>
+                    [class*="max-w-"] { max-width: none !important; }
+                    .container { max-width: 100% !important; width: 100% !important; }
+                    .wrapper { max-width: 100% !important; width: 100% !important; }
+                    table { width: 100% !important; }
+                </style>`;
+            }
+
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = rawHTML;
+            tempDiv.innerHTML = styleInjection + rawHTML;
+            
             const serializer = new XMLSerializer();
             let xhtml = "";
             Array.from(tempDiv.childNodes).forEach(node => {
