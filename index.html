@@ -3,754 +3,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VECTRA | VECTOR ENGINE</title>
+    <title>VECTRA V9 | TITAN GOLD</title>
     
-    <!-- Tailwind CSS -->
+    <!-- LIBRARIES -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400&family=Rajdhani:wght@500;600;700&family=Orbitron:wght@500;700;900&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- DYNAMIC THEME VARIABLES --- */
+        /* --- THEME VARIABLES --- */
         :root {
-            /* DEFAULT: DEEP GALAXY */
-            --bg-core: #05000a;
-            --text-main: #ffffff;
-            --text-muted: #a5b3ce;
-            
-            --glass-bg: rgba(20, 10, 35, 0.45);
-            --glass-border: rgba(188, 19, 254, 0.2);
-            --glass-blur: 25px;
-            
-            --accent-primary: #00f3ff; /* Cyan */
-            --accent-secondary: #bc13fe; /* Purple */
-            --accent-tertiary: #ff00ff; /* Pink */
-            --accent-glow: rgba(188, 19, 254, 0.5);
-
-            --editor-bg: rgba(0, 0, 0, 0.6);
-            --editor-border: rgba(255, 255, 255, 0.1);
-            
-            --btn-bg: rgba(0,0,0,0.5);
-            --btn-hover: #000;
-            
-            --grid-line-1: var(--accent-primary);
-            --grid-line-2: var(--accent-secondary);
+            --bg: #09090b;
+            --panel: #18181b;
+            --border: #27272a;
+            --accent: #3b82f6;
+            --text: #e4e4e7;
+            --text-dim: #a1a1aa;
+            --btn-bg: #27272a;
+            --active-bg: #3b82f6;
         }
 
-        /* THEME: WHITE LUXURIOUS */
         body.theme-white {
-            --bg-core: #f8f9fa; /* Cream White */
-            --text-main: #1a1a1a;
-            --text-muted: #555555;
-            
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(212, 175, 55, 0.4); /* Gold */
-            --glass-blur: 35px; /* Frosted Crystal */
-            
-            --accent-primary: #d4af37; /* Gold */
-            --accent-secondary: #b8860b; /* Dark Gold */
-            --accent-tertiary: #e5c15d; /* Light Gold */
-            --accent-glow: rgba(212, 175, 55, 0.3);
-
-            --editor-bg: #ffffff;
-            --editor-border: rgba(212, 175, 55, 0.3);
-            
-            --btn-bg: rgba(255,255,255,0.8);
-            --btn-hover: #fff;
-            
-            --grid-line-1: #d4af37;
-            --grid-line-2: #e5e5e5;
+            --bg: #eef2f6;
+            --panel: #ffffff;
+            --border: #e2e8f0;
+            --accent: #d4af37;
+            --text: #1e293b;
+            --text-dim: #64748b;
+            --btn-bg: #f1f5f9;
+            --active-bg: #d4af37;
         }
 
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: var(--bg-core);
-            color: var(--text-main);
-            overflow: hidden; 
-            transition: background-color 0.8s ease, color 0.8s ease;
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; transition: 0.3s; }
+        body.theme-white { font-family: 'Cinzel', serif; }
+        body.theme-white .font-tech { font-family: 'Rajdhani', sans-serif; }
+
+        /* LAYOUT */
+        .app-grid { display: grid; grid-template-columns: 350px 1fr; height: 100vh; }
+        .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        .main-stage { position: relative; background: #000; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* EDITOR */
+        .editor-container { flex: 1; position: relative; }
+        textarea {
+            width: 100%; height: 100%; background: rgba(0,0,0,0.2); color: var(--text-dim);
+            border: none; padding: 1rem; resize: none; outline: none;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.5;
         }
+        body.theme-white textarea { background: #f8fafc; color: #334155; }
+
+        /* CONTROLS */
+        .controls { padding: 1.25rem; border-top: 1px solid var(--border); gap: 1.25rem; display: flex; flex-direction: column; overflow-y: auto; }
+        .label { font-size: 0.7rem; font-weight: 700; color: var(--text-dim); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
         
-        body.theme-white {
-            font-family: 'Cinzel', serif; /* Font shift for luxury */
-        }
+        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+        .btn-row { display: flex; gap: 0.5rem; }
         
-        body.theme-white .font-tech {
-            font-family: 'Rajdhani', sans-serif; /* Keep numbers techy */
+        .btn {
+            padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--btn-bg); color: var(--text-dim); font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; text-align: center; display: flex; align-items: center; justify-content: center;
+            font-family: 'Rajdhani', sans-serif; flex: 1;
         }
-
-        /* --- BACKGROUND LAYERS --- */
+        .btn:hover { border-color: var(--accent); color: var(--text); }
+        .btn.active { background: var(--active-bg); border-color: var(--accent); color: #fff; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
         
-        /* 1. Galaxy Nebula (Visible in Dark Mode) */
-        .nebula-bg {
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(-45deg, #0a0015, #1f0030, #001235, #000000);
-            background-size: 400% 400%;
-            z-index: 0;
-            animation: gradientShift 20s ease infinite;
-            opacity: 1;
-            transition: opacity 1s;
+        .btn-action { background: var(--accent); color: white; border: none; padding: 0.75rem; font-size: 1rem; font-weight: 700; letter-spacing: 1px; }
+        .btn-action:hover { filter: brightness(1.1); transform: scale(1.01); }
+
+        /* PREVIEW AREA */
+        .preview-header {
+            height: 50px; background: var(--panel); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem;
         }
-        body.theme-white .nebula-bg { opacity: 0; }
-
-        /* 2. White Marble Glow (Visible in White Mode) */
-        .luxury-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f0f0f0 60%, #e0e0e0 100%);
-            z-index: 0;
-            opacity: 0;
-            transition: opacity 1s;
-        }
-        body.theme-white .luxury-bg { opacity: 1; }
-
-        /* Floating Orbs (Change color based on vars) */
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: floatOrb 15s infinite ease-in-out;
-            z-index: 0;
-            transition: background 1s;
-        }
-        .orb-1 { width: 600px; height: 600px; background: var(--accent-secondary); top: 10%; left: 20%; animation-delay: 0s; }
-        .orb-2 { width: 500px; height: 500px; background: var(--accent-primary); bottom: 10%; right: 10%; animation-delay: -5s; }
-        .orb-3 { width: 400px; height: 400px; background: var(--accent-tertiary); top: 40%; left: 60%; animation-delay: -10s; }
-
-        body.theme-white .orb { opacity: 0.2; filter: blur(100px); } /* Softer orbs in luxury */
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-30px, 40px) scale(0.9); }
-        }
-
-        /* --- CYBER GRID / FLOOR --- */
-        .cyber-grid {
-            position: absolute;
-            width: 200%;
-            height: 100%;
-            bottom: -30%;
-            left: -50%;
+        .preview-wrapper {
+            flex: 1; overflow: auto; 
+            background-color: var(--bg);
             background-image: 
-                linear-gradient(var(--grid-line-1) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-line-2) 1px, transparent 1px);
-            background-size: 50px 50px;
-            background-position: 0 0;
-            transform: perspective(500px) rotateX(60deg);
-            opacity: 0.15;
-            z-index: 0;
-            animation: gridMove 20s linear infinite;
-            mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
-            transition: background-image 1s;
-        }
-
-        @keyframes gridMove {
-            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
-            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); background-position: 0 50px; }
-        }
-
-        /* --- ACTIVE HEXAGONS --- */
-        .hex-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .hex {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(2px);
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            border-top: 1px solid rgba(255,255,255,0.3);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            animation: spinFloat 12s infinite linear;
-            transition: background 1s, box-shadow 1s;
-        }
-
-        /* Dynamic coloring based on vars */
-        .hex.colored-1 { background: linear-gradient(135deg, var(--accent-glow), transparent); box-shadow: 0 0 15px var(--accent-primary); }
-        .hex.colored-2 { background: linear-gradient(135deg, var(--accent-glow), transparent); box-shadow: 0 0 15px var(--accent-secondary); }
-        
-        body.theme-white .hex {
-             border-top: 1px solid var(--accent-primary);
-             opacity: 0.6;
-        }
-
-        @keyframes spinFloat {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(20px, -40px) rotate(180deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
-        }
-
-        /* --- UI PANELS (GLASS) --- */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-right: 1px solid var(--glass-border);
-            box-shadow: 
-                0 4px 30px rgba(0, 0, 0, 0.1),
-                inset 0 0 20px rgba(255, 255, 255, 0.05);
-            position: relative;
-            overflow: hidden;
-            transition: background 0.5s, border 0.5s;
+                linear-gradient(45deg, rgba(128,128,128,0.05) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(128,128,128,0.05) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(128,128,128,0.05) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(128,128,128,0.05) 75%);
+            background-size: 20px 20px;
+            display: flex; justify-content: center; align-items: flex-start; padding: 60px;
         }
         
-        .glass-header {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: background 0.5s, border 0.5s;
+        /* FRAME CONTAINER */
+        #iframeContainer {
+            transform-origin: top center; transition: transform 0.2s ease-out;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5); background: white;
         }
+        iframe { border: none; background: white; display: block; }
 
-        /* Editor */
-        .code-editor {
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--editor-bg);
-            color: var(--text-muted);
-            border: 1px solid var(--editor-border);
-            font-size: 15px;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
-            transition: all 0.3s;
-            border-radius: 8px;
+        /* RENDER CURTAIN */
+        #renderCurtain {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(9, 9, 11, 0.95); z-index: 9999; display: none;
+            flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);
         }
-        .code-editor:focus {
-            border-color: var(--accent-primary);
-            color: var(--text-main);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
+        #renderZone { position: absolute; top: 0; left: 0; pointer-events: none; opacity: 0; }
         
-        body.theme-white .code-editor {
-            color: #333;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-        }
-        body.theme-white .code-editor:focus {
-            color: #000;
-        }
-
-        /* Slider */
-        input[type=range] {
-            -webkit-appearance: none;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 22px; width: 22px;
-            border-radius: 50%;
-            background: #fff;
-            border: 2px solid #000;
-            cursor: pointer;
-            margin-top: -9px; 
-            box-shadow: 0 0 15px var(--accent-primary);
-            transition: box-shadow 0.3s;
-        }
-        body.theme-white input[type=range]::-webkit-slider-thumb {
-            background: var(--accent-primary);
-            border: 2px solid #fff;
-            box-shadow: 0 0 10px var(--accent-primary);
-        }
-
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px;
-            cursor: pointer;
-            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary), var(--accent-tertiary));
-            border-radius: 2px;
-        }
-
-        /* Buttons */
-        .btn-theme {
-            background: var(--btn-bg);
-            border: 1px solid var(--accent-primary);
-            color: var(--accent-primary);
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-        body.theme-white .btn-theme {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            color: #000;
-            border-color: var(--accent-primary);
-        }
+        .loading-bar { width: 240px; height: 4px; background: #333; border-radius: 2px; overflow: hidden; margin-top: 24px; }
+        .loading-progress { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s; }
         
-        .btn-theme:hover {
-            background: var(--accent-primary);
-            color: var(--btn-hover);
-            box-shadow: 0 0 25px var(--accent-primary);
-        }
-
-        .btn-action {
-            background: linear-gradient(45deg, var(--accent-secondary), #14365d);
-            border: 1px solid var(--accent-tertiary);
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
-            text-shadow: 0 0 5px var(--accent-tertiary);
-            transition: 0.3s;
-        }
-        body.theme-white .btn-action {
-            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-            border: none;
-            color: #000;
-            font-family: 'Cinzel', serif;
-            text-shadow: none;
-        }
-        
-        .btn-action:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 40px var(--accent-glow);
-        }
-
-        /* Toggle Button for Force Fit */
-        .toggle-btn {
-            background: transparent;
-            border: 1px solid var(--text-muted);
-            color: var(--text-muted);
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .toggle-btn.active {
-            background: var(--accent-primary);
-            color: #000;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        /* Text Gradients */
-        .text-gradient-main {
-            background: linear-gradient(to right, #fff, var(--accent-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        body.theme-white .text-gradient-main {
-            background: linear-gradient(to right, #000, var(--accent-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Checkerboard */
-        .checker-bg {
-            background-color: var(--bg-core);
-            background-image: 
-                linear-gradient(45deg, rgba(128,128,128,0.1) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(128,128,128,0.1) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, rgba(128,128,128,0.1) 75%), 
-                linear-gradient(-45deg, transparent 75%, rgba(128,128,128,0.1) 75%);
-            background-size: 30px 30px;
-        }
-
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 10px; height: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: var(--glass-border);
-            border-radius: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+        /* Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--accent); margin-top: -6px; cursor: pointer; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--border); border-radius: 2px; }
     </style>
 </head>
-<body class="h-screen flex flex-col relative" id="appBody">
+<body>
 
-    <!-- Background Layers -->
-    <div class="nebula-bg"></div>
-    <div class="luxury-bg"></div>
-    
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-
-    <div class="cyber-grid"></div>
-
-    <div class="hex-layer">
-        <div class="hex colored-1" style="width: 120px; height: 138px; top: 15%; left: 8%; animation-duration: 8s;"></div>
-        <div class="hex colored-2" style="width: 80px; height: 92px; top: 60%; left: 15%; animation-duration: 12s; animation-delay: 2s;"></div>
-        <div class="hex colored-3" style="width: 200px; height: 230px; top: 30%; right: 10%; animation-duration: 15s; animation-delay: 1s;"></div>
+    <!-- RENDER OVERLAY -->
+    <div id="renderCurtain">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-white mb-4"></i>
+        <h1 class="text-2xl font-bold text-white tracking-widest font-tech">RENDERING PIXELS</h1>
+        <div class="loading-bar"><div class="loading-progress" id="progressBar"></div></div>
+        <div id="renderZone"></div>
     </div>
 
-    <!-- Header -->
-    <header class="glass-header h-20 flex items-center justify-between px-8 z-30 relative">
-        <div class="flex items-center gap-4">
-            <div class="w-10 h-10 flex items-center justify-center relative animate-pulse">
-                <i class="fa-solid fa-layer-group text-3xl" style="color: var(--accent-primary); filter: drop-shadow(0 0 10px var(--accent-primary));"></i>
-            </div>
-            <h1 class="text-4xl tracking-widest font-black italic relative">
-                <span class="text-gradient-main font-[Orbitron] body.theme-white:font-[Cinzel]">VECTRA</span>
-                <span id="themeLabel" class="text-sm absolute top-0 -right-24 font-bold tracking-normal opacity-80" style="color: var(--accent-tertiary); text-shadow: 0 0 10px var(--accent-glow)">GALAXY</span>
-            </h1>
-        </div>
-        
-        <!-- Theme Toggle -->
-        <button onclick="toggleTheme()" class="btn-theme px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 transition-all hover:scale-105">
-            <i id="themeIcon" class="fa-solid fa-moon"></i> 
-            <span id="themeBtnText">SWITCH THEME</span>
-        </button>
-    </header>
-
-    <!-- Main Workspace -->
-    <main class="flex-1 flex overflow-hidden z-20 relative">
-        
-        <!-- Left: Input -->
-        <section class="w-[35%] flex flex-col glass-panel ml-4 my-4 rounded-xl">
-            <div class="h-14 border-b border-[var(--glass-border)] flex items-center justify-between px-6 bg-black/10">
-                <span class="text-2xl font-bold tracking-wide" style="color: var(--text-main)"><i class="fa-solid fa-code mr-3" style="color: var(--accent-primary)"></i>SOURCE</span>
-                <div class="flex gap-2">
-                    <button onclick="pasteCode()" class="text-lg transition font-bold tracking-wider hover:scale-105 transform duration-200" style="color: var(--accent-primary)" title="Paste">
-                        <i class="fa-solid fa-paste mr-1"></i> PASTE
-                    </button>
-                    <div class="w-px h-6 bg-white/20 self-center"></div>
-                    <button onclick="clearEditor()" class="text-lg transition font-bold tracking-wider hover:scale-105 transform duration-200" style="color: var(--accent-tertiary)">
-                        <i class="fa-solid fa-eraser mr-1"></i> WIPE
-                    </button>
-                </div>
-            </div>
-            <div class="flex-1 relative p-4">
-                <textarea id="htmlInput" class="code-editor w-full h-full p-6" spellcheck="false" placeholder="Paste HTML here..."></textarea>
-            </div>
-            <input type="file" id="fileImport" accept=".html,.txt" class="hidden">
-            <div class="h-16 border-t border-[var(--glass-border)] flex items-center px-6 gap-4 bg-black/10 rounded-b-xl">
-                <button onclick="document.getElementById('fileImport').click()" class="btn-theme px-6 py-2 rounded text-xl font-bold uppercase tracking-wide flex-1">
-                    <i class="fa-solid fa-upload mr-2"></i> LOAD FILE
-                </button>
-                <div id="statusMsg" class="text-lg font-bold ml-auto opacity-0 transition-opacity duration-500 font-mono" style="color: var(--accent-primary)">READY</div>
-            </div>
-        </section>
-
-        <!-- Middle: Controls -->
-        <section class="w-[20%] flex flex-col glass-panel mx-4 my-4 rounded-xl">
-            <div class="h-14 border-b border-[var(--glass-border)] flex items-center px-6 bg-black/10">
-                <span class="text-2xl font-bold tracking-wide" style="color: var(--text-main)"><i class="fa-solid fa-sliders mr-3" style="color: var(--accent-secondary)"></i>PARAMS</span>
-            </div>
-
-            <div class="p-6 flex flex-col gap-6 h-full relative">
-                <!-- Dimensions -->
-                <div class="space-y-4">
-                    <label class="text-xl font-bold block mb-2 drop-shadow-md tracking-wider font-tech" style="color: var(--text-muted)">BASE WIDTH [PX]</label>
-                    <div class="relative py-2">
-                         <input type="range" id="widthSlider" min="300" max="12000" step="10" value="1920" class="w-full">
-                    </div>
-                    <div class="flex gap-3">
-                        <input type="number" id="baseWidth" value="1920" min="300" max="12000" class="w-1/2 bg-black/20 border border-[var(--accent-primary)] rounded px-4 py-2 font-mono text-xl focus:outline-none transition text-center" style="color: var(--accent-primary)">
-                        <button onclick="setAutoWidth()" class="w-1/2 btn-theme rounded text-lg font-bold">
-                            AUTO
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Force Fit Toggle -->
-                <div class="space-y-2">
-                    <label class="text-lg font-bold block tracking-wide font-tech" style="color: var(--text-muted)">CONTENT SCALING</label>
-                    <button id="forceFitBtn" onclick="toggleForceFit()" class="toggle-btn active w-full py-3 rounded-lg text-lg flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-expand"></i> FORCE FIT WIDTH
-                    </button>
-                    <p class="text-xs opacity-60" style="color: var(--text-muted)">Overrides max-width constraints to fill canvas.</p>
-                </div>
-
-                <div class="p-5 rounded border border-[var(--accent-secondary)] shadow-[0_0_20px_var(--glass-border)] relative overflow-hidden group" style="background: linear-gradient(90deg, rgba(0,0,0,0.2), transparent);">
-                    <div class="absolute top-0 left-0 w-1 h-full" style="background: var(--accent-secondary)"></div>
-                    <i class="fa-solid fa-infinity mr-2" style="color: var(--accent-secondary)"></i>
-                    <strong class="tracking-wider" style="color: var(--text-main)">ENGINE:</strong> <span style="color: var(--accent-secondary)">SVG VECTOR</span><br>
-                    <span class="text-sm opacity-70 font-mono mt-1 block" style="color: var(--text-muted)">Lossless Scaling Active.</span>
-                </div>
-
-                <div class="mt-auto space-y-4 pb-4">
-                    <button onclick="openInNewTab()" class="w-full btn-theme py-3 rounded text-xl font-bold shadow-lg flex items-center justify-center gap-3">
-                        <i class="fa-solid fa-expand"></i> PREVIEW TAB
-                    </button>
-                    
-                    <button onclick="exportSVG()" id="exportBtn" class="w-full btn-action py-4 rounded text-2xl font-bold uppercase tracking-widest flex items-center justify-center gap-3">
-                        <i class="fa-solid fa-bolt"></i> EXPORT
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Right: Preview -->
-        <section class="w-[45%] flex flex-col relative overflow-hidden checker-bg mr-4 my-4 rounded-xl border border-[var(--glass-border)] shadow-[0_0_50px_rgba(0,0,0,0.2)]" id="previewContainer">
-            <div class="h-14 backdrop-blur border-b border-[var(--glass-border)] flex items-center justify-between px-6 absolute top-0 w-full z-10" style="background: var(--glass-bg)">
-                <span class="text-2xl font-bold tracking-wide" style="color: var(--text-main)"><i class="fa-solid fa-desktop mr-3 text-green-400"></i>RENDER</span>
-                <span id="zoomLabel" class="text-lg font-mono font-bold border border-green-500/30 px-3 py-1 rounded shadow-[0_0_10px_rgba(0,255,0,0.2)]" style="color: #4ade80; background: rgba(0,0,0,0.6)">100%</span>
+    <div class="app-grid">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="p-5 border-b border-[var(--border)] flex justify-between items-center">
+                <h1 class="text-xl font-black italic tracking-wider font-[Orbitron] body.theme-white:font-[Cinzel] text-[var(--accent)]">
+                    VECTRA <span class="text-xs opacity-50 ml-1 not-italic font-mono text-[var(--text)]">TITAN</span>
+                </h1>
+                <button onclick="toggleTheme()" class="text-[var(--text-dim)] hover:text-[var(--accent)] transition"><i id="themeIcon" class="fa-solid fa-moon"></i></button>
             </div>
             
-            <div id="scrollZone" class="flex-1 w-full h-full overflow-y-auto overflow-x-hidden pt-14 p-8 custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
-                <div class="flex flex-col items-center min-h-full">
-                    <div id="iframeWrapper" class="shadow-2xl origin-top transition-transform duration-200 ease-out border-0 ring-1 ring-black/10 mb-8 bg-white">
-                        <iframe id="previewFrame" class="block border-0" scrolling="no"></iframe>
+            <div class="editor-container">
+                <textarea id="htmlInput" placeholder="<!-- Paste your HTML code here -->" spellcheck="false"></textarea>
+                <div class="absolute bottom-4 right-4 flex gap-2">
+                    <button onclick="pasteCode()" class="bg-[var(--btn-bg)] border border-[var(--border)] text-[var(--accent)] px-3 py-1.5 rounded text-xs font-bold hover:bg-[var(--accent)] hover:text-white transition tracking-wider">PASTE</button>
+                    <button onclick="clearEditor()" class="bg-[var(--btn-bg)] border border-[var(--border)] text-red-400 px-3 py-1.5 rounded text-xs font-bold hover:bg-red-500 hover:text-white transition tracking-wider">WIPE</button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <!-- Dimensions -->
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="label">BASE WIDTH</span>
+                        <span id="widthVal" class="text-xs font-mono text-[var(--accent)]">1920px</span>
+                    </div>
+                    <input type="range" id="widthSlider" min="300" max="4000" step="10" value="1920" class="w-full mb-3">
+                    <div class="btn-row">
+                        <button class="btn" onclick="setWidth(1920)">1920</button>
+                        <button class="btn" onclick="setWidth(1440)">1440</button>
+                        <button class="btn" onclick="setWidth(1080)">1080</button>
+                    </div>
+                </div>
+
+                <!-- Aspect Ratio -->
+                <div>
+                    <span class="label">FIT / RATIO</span>
+                    <!-- Fixed Ratio Buttons -->
+                    <div class="btn-grid mb-2" id="ratioOptions">
+                        <button class="btn" id="ar-auto" onclick="setRatio('auto')">AUTO</button>
+                        <button class="btn active" id="ar-16-9" onclick="setRatio(1.777)">16:9</button>
+                        <button class="btn" id="ar-4-3" onclick="setRatio(1.333)">4:3</button>
+                        <button class="btn" id="ar-1-1" onclick="setRatio(1)">1:1</button>
+                        <button class="btn" id="ar-9-16" onclick="setRatio(0.5625)">9:16</button>
+                        <button class="btn" id="ar-21-9" onclick="setRatio(2.333)">21:9</button>
+                    </div>
+                    <p class="text-[10px] text-[var(--text-dim)] leading-tight" id="fitDesc">Fixed Aspect Ratio (16:9). Adds background if needed.</p>
+                </div>
+
+                <!-- Resolution -->
+                <div>
+                    <span class="label">OUTPUT SCALE</span>
+                    <!-- Resolution Scale Buttons -->
+                    <div class="btn-row" id="scaleOptions">
+                        <button class="btn" onclick="setScale(2, this)">2K</button>
+                        <button class="btn active" onclick="setScale(4, this)">4K</button>
+                        <button class="btn" onclick="setScale(6, this)">6K</button>
+                        <button class="btn" onclick="setScale(8, this)">8K</button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-2 flex flex-col gap-3">
+                    <button class="btn w-full gap-2 border-[var(--accent)] text-[var(--accent)]" onclick="openPreviewTab()">
+                        <i class="fa-solid fa-external-link-alt"></i> NEW TAB PREVIEW
+                    </button>
+                    <div class="flex gap-2">
+                        <button class="btn-action w-full rounded flex items-center justify-center gap-2" onclick="startRender('png')">
+                            <i class="fa-solid fa-bolt"></i> RENDER PNG
+                        </button>
+                        <button class="btn w-1/3 font-bold" onclick="startRender('svg')">SVG</button>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-    </main>
+        <!-- MAIN STAGE -->
+        <div class="main-stage">
+            <div class="preview-header">
+                <div class="flex items-center gap-4">
+                    <span class="text-xs font-bold text-[var(--accent)] tracking-widest">LIVE PREVIEW</span>
+                    <span id="resLabel" class="text-xs font-mono text-[var(--text-dim)] border-l border-[var(--border)] pl-4">3840 x Auto</span>
+                </div>
+                
+                <!-- Zoom -->
+                <div class="flex items-center gap-1 bg-[var(--btn-bg)] rounded border border-[var(--border)] p-0.5">
+                    <button onclick="adjustZoom(-0.1)" class="w-7 h-7 flex items-center justify-center text-[var(--text-dim)] hover:text-[var(--text)]"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                    <span id="zoomLabel" class="text-[10px] font-mono w-10 text-center text-[var(--accent)]">Fit</span>
+                    <button onclick="adjustZoom(0.1)" class="w-7 h-7 flex items-center justify-center text-[var(--text-dim)] hover:text-[var(--text)]"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                </div>
+            </div>
+
+            <div class="preview-wrapper" id="viewport">
+                <div id="iframeContainer">
+                    <iframe id="previewFrame" scrolling="no"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // --- THEME LOGIC ---
-        let isGalaxy = true;
-        const appBody = document.getElementById('appBody');
-        const themeLabel = document.getElementById('themeLabel');
-        const themeIcon = document.getElementById('themeIcon');
-        const themeBtnText = document.getElementById('themeBtnText');
+        // --- STATE ---
+        let state = {
+            width: 1920,
+            scale: 4, // Default 4K
+            targetRatio: 1.777, // Default 16:9 (Fixed)
+            zoom: 1.0,
+            theme: 'galaxy'
+        };
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            editor: document.getElementById('htmlInput'),
+            iframe: document.getElementById('previewFrame'),
+            container: document.getElementById('iframeContainer'),
+            viewport: document.getElementById('viewport'),
+            baseWidthInput: document.getElementById('baseWidth'),
+            widthSlider: document.getElementById('widthSlider'),
+            widthVal: document.getElementById('widthVal'),
+            resLabel: document.getElementById('resLabel'),
+            zoomLabel: document.getElementById('zoomLabel'),
+            renderCurtain: document.getElementById('renderCurtain'),
+            progressBar: document.getElementById('progressBar'),
+            renderZone: document.getElementById('renderZone'),
+            fitDesc: document.getElementById('fitDesc')
+        };
+
+        // --- INIT ---
+        window.onload = () => {
+            // Initialize with 16:9 active
+            updatePreview();
+            window.addEventListener('resize', fitToScreen);
+        };
+
+        // --- LOGIC ---
+        els.editor.addEventListener('input', debounce(updatePreview, 400));
+        els.widthSlider.addEventListener('input', (e) => setWidth(parseInt(e.target.value)));
+
+        function setWidth(val) {
+            state.width = val;
+            els.widthSlider.value = val;
+            els.widthVal.innerText = val + 'px';
+            updatePreview();
+        }
+
+        function setRatio(ratio) {
+            state.targetRatio = ratio;
+            
+            // Update Ratio Buttons
+            const map = { 'auto':'ar-auto', '1.777':'ar-16-9', '1.333':'ar-4-3', '1':'ar-1-1', '0.5625':'ar-9-16', '2.333':'ar-21-9' };
+            document.querySelectorAll('#ratioOptions .btn').forEach(b => b.classList.remove('active'));
+            
+            let key = 'auto';
+            if (typeof ratio === 'number') {
+                // Find closest float match
+                for(let k in map) {
+                    if (Math.abs(parseFloat(k) - ratio) < 0.01) {
+                         document.getElementById(map[k]).classList.add('active');
+                         break;
+                    }
+                }
+            } else {
+                document.getElementById('ar-auto').classList.add('active');
+            }
+
+            els.fitDesc.innerText = ratio === 'auto' 
+                ? "Auto-Fit: Trims height exactly to content." 
+                : "Fixed Aspect Ratio. Adds background if needed.";
+            
+            updatePreview();
+        }
+
+        function setScale(s, btn) {
+            state.scale = s;
+            // Use the fixed ID selector
+            document.querySelectorAll('#scaleOptions .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateDims();
+        }
 
         function toggleTheme() {
-            isGalaxy = !isGalaxy;
-            if (isGalaxy) {
-                // Switch to Galaxy
-                appBody.classList.remove('theme-white');
-                themeLabel.innerText = "GALAXY";
-                themeLabel.style.color = "var(--accent-tertiary)";
-                themeIcon.className = "fa-solid fa-moon";
-                themeBtnText.innerText = "GALAXY MODE";
-            } else {
-                // Switch to White Luxury
-                appBody.classList.add('theme-white');
-                themeLabel.innerText = "LUXURY";
-                themeLabel.style.color = "#d4af37";
-                themeIcon.className = "fa-solid fa-gem";
-                themeBtnText.innerText = "LUXURY MODE";
-            }
+            state.theme = state.theme === 'galaxy' ? 'white' : 'galaxy';
+            document.body.className = state.theme === 'galaxy' ? '' : 'theme-white';
+            document.getElementById('themeIcon').className = state.theme === 'galaxy' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
         }
 
-        // --- Variables ---
-        const editor = document.getElementById('htmlInput');
-        const iframe = document.getElementById('previewFrame');
-        const iframeWrapper = document.getElementById('iframeWrapper');
-        const previewContainer = document.getElementById('previewContainer');
-        const baseWidthInput = document.getElementById('baseWidth');
-        const widthSlider = document.getElementById('widthSlider');
-        const zoomLabel = document.getElementById('zoomLabel');
-        const statusMsg = document.getElementById('statusMsg');
-        const forceFitBtn = document.getElementById('forceFitBtn');
-
-        let isForceFit = true; // Default ON
-
-        // --- Initialization ---
-        window.addEventListener('DOMContentLoaded', () => {
-            updatePreview();
-            window.addEventListener('resize', fitPreview);
-        });
-
-        // --- Live Preview Logic ---
-        editor.addEventListener('input', debounce(() => {
-            updatePreview();
-        }, 200));
-
-        baseWidthInput.addEventListener('input', () => {
-            widthSlider.value = baseWidthInput.value;
-            updatePreview();
-        });
-
-        widthSlider.addEventListener('input', () => {
-            baseWidthInput.value = widthSlider.value;
-            updatePreview();
-        });
-
-        function setAutoWidth() {
-            baseWidthInput.value = 1920;
-            widthSlider.value = 1920;
-            updatePreview();
-            showStatus("RESET: 1920PX");
-        }
-
-        function toggleForceFit() {
-            isForceFit = !isForceFit;
-            if(isForceFit) {
-                forceFitBtn.classList.add('active');
-            } else {
-                forceFitBtn.classList.remove('active');
-            }
-            updatePreview();
-        }
-
-        function updatePreview() {
-            const content = editor.value;
-            const width = parseInt(baseWidthInput.value) || 1920;
-
-            let extraStyles = `
-                body { margin: 0; padding: 0; width: ${width}px; overflow: hidden; }
-                html, body { min-height: 100vh; }
+        // --- UNIFIED HTML GENERATOR (TITAN CORE) ---
+        function generateTitanHTML(width) {
+            const raw = els.editor.value;
+            const isAutoFit = state.targetRatio === 'auto';
+            
+            let css = `
+                body { margin: 0; padding: 0; background: white; font-family: sans-serif; overflow-x: hidden; }
+                img { max-width: 100%; height: auto; display: block; }
+                ::-webkit-scrollbar { display: none; } /* Hide scrollbars in export */
             `;
 
-            // INJECT FORCE FIT STYLES
-            if (isForceFit) {
-                extraStyles += `
-                    /* FORCE FIT OVERRIDES */
-                    [class*="max-w-"] { max-width: none !important; }
-                    .container { max-width: 100% !important; width: 100% !important; }
-                    .wrapper { max-width: 100% !important; width: 100% !important; }
-                    table { width: 100% !important; }
+            if (isAutoFit) {
+                // AUTO FIT: Nuclear Reset + Height Fitting
+                css += `
+                    html, body { width: ${width}px; min-height: 0 !important; height: auto !important; overflow: visible !important; }
+                    [class*="max-w-"] { max-width: 100% !important; }
+                    .container, .w-full, .mx-auto { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+                    table { width: 100% !important; table-layout: fixed !important; }
+                    body > div { min-height: 100vh; }
                 `;
+            } else {
+                // FIXED RATIO
+                const h = width / state.targetRatio;
+                css += `body { width: ${width}px; min-height: ${h}px; }`;
             }
 
-            const docContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="utf-8">
-                    <style>
-                        ${extraStyles}
-                    </style>
-                </head>
-                <body>
-                    ${content}
-                </body>
-                </html>
-            `;
-            
-            const doc = iframe.contentDocument || iframe.contentWindow.document;
-            doc.open();
-            doc.write(docContent);
-            doc.close();
+            // Handle Full HTML vs Snippet
+            if (raw.toLowerCase().includes('<html')) {
+                return raw.replace('</head>', `<style>${css}</style></head>`);
+            }
+            return `<!DOCTYPE html><html><head>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+                <style>${css}</style>
+                </head><body>${raw}</body></html>`;
+        }
 
-            iframe.style.width = width + 'px';
+        // --- PREVIEW LOGIC ---
+        function updatePreview() {
+            const width = state.width;
+            const fullHTML = generateTitanHTML(width);
             
-            iframe.onload = () => {
-                try {
-                    const bodyH = iframe.contentDocument.body.scrollHeight;
-                    const minH = Math.round(width * 0.5625); 
-                    const finalH = Math.max(bodyH, minH);
-                    iframe.style.height = finalH + 'px';
-                    fitPreview(); 
-                } catch(e) {
-                    iframe.style.height = (width * 0.5625) + 'px';
-                    fitPreview();
-                }
+            const doc = els.iframe.contentDocument || els.iframe.contentWindow.document;
+            doc.open(); doc.write(fullHTML); doc.close();
+
+            els.iframe.style.width = width + 'px';
+            els.iframe.style.height = '100px'; // Reset
+
+            els.iframe.onload = () => {
+                setTimeout(() => {
+                    const bodyH = els.iframe.contentDocument.documentElement.scrollHeight;
+                    let finalH = bodyH;
+
+                    if (state.targetRatio !== 'auto') {
+                        finalH = Math.max(bodyH, width / state.targetRatio);
+                    }
+                    
+                    els.iframe.style.height = finalH + 'px';
+                    updateDims();
+                    fitToScreen();
+                }, 400);
             };
         }
 
-        function fitPreview() {
-            const width = parseInt(baseWidthInput.value) || 1920;
-            const containerW = previewContainer.clientWidth - 80; 
-            
-            let scale = containerW / width;
-            if (scale > 1) scale = 1; 
-
-            iframeWrapper.style.transform = `scale(${scale})`;
-            iframeWrapper.style.width = width + 'px';
-            
-            const currentHeight = parseInt(iframe.style.height);
-            const scaledHeight = currentHeight * scale;
-            const spaceDiff = scaledHeight - currentHeight;
-            iframeWrapper.style.marginBottom = spaceDiff + 'px';
-
-            zoomLabel.innerText = Math.round(scale * 100) + '%';
+        function updateDims() {
+            const h = parseInt(els.iframe.style.height) || 0;
+            els.resLabel.innerText = `OUTPUT: ${state.width * state.scale} x ${h * state.scale} px`;
         }
 
-        function debounce(func, wait) {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
+        function fitToScreen() {
+            const w = state.width;
+            const containerW = els.viewport.clientWidth - 80;
+            const fitScale = Math.min(1, containerW / w);
+            const totalScale = fitScale * state.zoom;
+            
+            els.container.style.transform = `scale(${totalScale})`;
+            els.container.style.width = w + 'px';
+            els.container.style.height = els.iframe.style.height;
+            
+            const visualH = parseInt(els.iframe.style.height) * totalScale;
+            els.container.style.marginBottom = `-${parseInt(els.iframe.style.height) - visualH}px`;
+            
+            els.zoomLabel.innerText = `${Math.round(totalScale * 100)}%`;
         }
 
-        document.getElementById('fileImport').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                editor.value = e.target.result;
-                updatePreview();
-                showStatus('FILE LOADED');
-            };
-            reader.readAsText(file);
-        });
+        function adjustZoom(delta) {
+            state.zoom = Math.max(0.1, state.zoom + delta);
+            fitToScreen();
+        }
 
-        async function pasteCode() {
+        // --- RENDER ENGINE ---
+        async function startRender(format) {
+            els.renderCurtain.style.display = 'flex';
+            els.progressBar.style.width = '10%';
+            
+            const w = state.width;
+            const fullHTML = generateTitanHTML(w);
+
+            // SVG Path
+            if (format === 'svg') {
+                const h = parseInt(els.iframe.style.height) || w;
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(fullHTML, 'text/html');
+                const serializer = new XMLSerializer();
+                let safeXHTML = serializer.serializeToString(doc.documentElement);
+                safeXHTML = safeXHTML.replace(/&(?![a-zA-Z0-9#]+;)/g, '&amp;');
+
+                let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="background:white;width:${w}px;height:${h}px">${safeXHTML}</div></foreignObject></svg>`;
+                
+                download(new Blob([svg], {type: 'image/svg+xml;charset=utf-8'}), 'VECTRA_Vector.svg');
+                setTimeout(() => { els.renderCurtain.style.display = 'none'; }, 500);
+                return;
+            }
+
+            // Raster Path
+            await new Promise(r => setTimeout(r, 200));
+            els.progressBar.style.width = '30%';
+
+            els.renderZone.innerHTML = '';
+            const container = document.createElement('iframe');
+            container.style.width = w + 'px';
+            container.style.height = '10px';
+            container.style.border = 'none';
+            container.style.opacity = '0'; 
+            container.style.position = 'absolute';
+            els.renderZone.appendChild(container);
+
+            const doc = container.contentDocument;
+            doc.open(); doc.write(fullHTML); doc.close();
+
+            els.progressBar.style.width = '50%';
+            await new Promise(r => setTimeout(r, 2500)); 
+
+            const bodyH = doc.documentElement.scrollHeight;
+            let renderH = bodyH;
+            if (state.targetRatio !== 'auto') {
+                renderH = Math.max(bodyH, w / state.targetRatio);
+            }
+            container.style.height = renderH + 'px';
+            
+            els.progressBar.style.width = '75%';
+
             try {
-                const text = await navigator.clipboard.readText();
-                editor.value = text;
-                updatePreview();
-                showStatus('TEXT PASTED');
-            } catch (err) {
-                console.error('Failed to read clipboard', err);
-                alert("Permission needed to paste. Please use Ctrl+V.");
+                const canvas = await html2canvas(doc.documentElement, {
+                    scale: state.scale,
+                    useCORS: true,
+                    allowTaint: false,
+                    width: w,
+                    height: renderH,
+                    windowWidth: w,
+                    windowHeight: renderH,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+
+                els.progressBar.style.width = '100%';
+                
+                const blob = await new Promise(r => canvas.toBlob(r, format === 'png' ? 'image/png' : 'image/jpeg', 0.95));
+                download(blob, `VECTRA_${w*state.scale}x${Math.round(renderH*state.scale)}.${format}`);
+
+            } catch (e) {
+                alert("Render Error: " + e.message);
+            } finally {
+                els.renderZone.innerHTML = '';
+                els.renderCurtain.style.display = 'none';
+                els.progressBar.style.width = '0%';
             }
         }
 
-        function clearEditor() {
-            editor.value = '';
-            updatePreview();
-            showStatus('EDITOR CLEARED');
-        }
-
-        function showStatus(msg) {
-            statusMsg.innerText = msg;
-            statusMsg.classList.remove('opacity-0');
-            setTimeout(() => statusMsg.classList.add('opacity-0'), 2000);
-        }
-
-        function openInNewTab() {
-            const content = editor.value;
-            const width = baseWidthInput.value;
-            const fullPage = `<!DOCTYPE html><html><head><style>body{margin:0;width:${width}px;}</style></head><body>${content}</body></html>`;
-            const blob = new Blob([fullPage], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-        }
-
-        function exportSVG() {
-            const rawHTML = editor.value;
-            const width = parseInt(baseWidthInput.value) || 1920;
-            const height = parseInt(iframe.style.height) || Math.round(width * 0.5625);
-
-            // Add Styles for Export
-            let styleInjection = "";
-            if(isForceFit) {
-                styleInjection = `<style>
-                    [class*="max-w-"] { max-width: none !important; }
-                    .container { max-width: 100% !important; width: 100% !important; }
-                    .wrapper { max-width: 100% !important; width: 100% !important; }
-                    table { width: 100% !important; }
-                </style>`;
-            }
-
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = styleInjection + rawHTML;
-            
-            const serializer = new XMLSerializer();
-            let xhtml = "";
-            Array.from(tempDiv.childNodes).forEach(node => {
-                xhtml += serializer.serializeToString(node);
-            });
-
-            const svgContent = `
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-    <foreignObject width="100%" height="100%">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px; height:${height}px;">
-            ${xhtml}
-        </div>
-    </foreignObject>
-</svg>`;
-
-            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+        function download(blob, name) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `VECTRA_Render_${width}x${height}.svg`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            a.href = url; a.download = name; a.click();
             URL.revokeObjectURL(url);
-            
-            showStatus("SVG GENERATED");
         }
+
+        function openPreviewTab() {
+            const width = state.width;
+            const fullHTML = generateTitanHTML(width);
+            
+            // New Tab Engine (Direct Write)
+            const win = window.open("", "_blank");
+            if (win) {
+                win.document.open();
+                win.document.write(fullHTML);
+                win.document.close();
+                win.document.title = "VECTRA Preview";
+            } else {
+                alert("Please allow pop-ups to view the preview.");
+            }
+        }
+
+        function debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; }
+        async function pasteCode() { try { els.editor.value = await navigator.clipboard.readText(); updatePreview(); } catch(e) { alert("Use Ctrl+V"); } }
+        function clearEditor() { els.editor.value = ''; updatePreview(); }
+
     </script>
 </body>
 </html>
